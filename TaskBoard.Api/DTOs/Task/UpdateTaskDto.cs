@@ -14,7 +14,7 @@ namespace TaskBoard.Api.DTOs.Task
 
         public Priority Priority { get; set; }
 
-        public TaskStatus Status { get; set; }
+        public BoardTaskStatus Status { get; set; }
 
         public DateTime? DueDate { get; set; }
     }

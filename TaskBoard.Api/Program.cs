@@ -44,6 +44,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.EnsureCreatedAsync();
+    await SeedData.InitializeAsync(db);
+}
 app.UseMiddleware<ExceptionMiddleware>();
 // Configure pipeline
 if (app.Environment.IsDevelopment())

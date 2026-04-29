@@ -8,7 +8,7 @@ namespace TaskBoard.Api.Models
         Critical
     }
 
-    public enum TaskStatus
+    public enum BoardTaskStatus
     {
         Todo,
         InProgress,

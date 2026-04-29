@@ -19,7 +19,7 @@ namespace TaskBoard.Api.Models
 
         public Priority Priority { get; set; } = Priority.Low;
 
-        public TaskStatus Status { get; set; } = TaskStatus.Todo;
+        public BoardTaskStatus  Status { get; set; } = BoardTaskStatus .Todo;
 
         public DateTime? DueDate { get; set; }
 

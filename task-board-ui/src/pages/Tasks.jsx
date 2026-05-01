@@ -8,6 +8,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import api from "../api";
+import { useNavigate } from "react-router-dom";
 
 export default function Tasks() {
   const [projects, setProjects] = useState([]);
@@ -20,7 +21,7 @@ export default function Tasks() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     loadProjects();
   }, []);
@@ -182,7 +183,8 @@ export default function Tasks() {
               whileHover={{ y: -4 }}
               className="bg-white rounded-2xl shadow p-6"
             >
-              <div className="flex justify-between gap-3 flex-wrap">
+              <div className="flex justify-between gap-3 flex-wrap" onClick={() => navigate(`/tasks/${task.id}`)}
+                className="bg-white rounded-2xl shadow p-6 cursor-pointer">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeColor(
                     task.priority

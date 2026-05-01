@@ -4,12 +4,15 @@ import {
   FolderKanban,
   ListTodo,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  RefreshCw
 } from "lucide-react";
-import api from "../services/api";
+import api from "../api";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadDashboard();
@@ -17,18 +20,16 @@ export default function Dashboard() {
 
   const loadDashboard = async () => {
     try {
+      setLoading(true);
+      setError("");
+
       const res = await api.get("/dashboard");
       setData(res.data);
-    } catch {
-      setData({
-        totalProjects: 12,
-        totalTasks: 48,
-        overdueTasks: 6,
-        doneTasks: 30,
-        todoTasks: 10,
-        inProgressTasks: 5,
-        reviewTasks: 3
-      });
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load dashboard data.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +56,31 @@ export default function Dashboard() {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[70vh]">
+        <div className="animate-spin">
+          <RefreshCw size={34} className="text-blue-700" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-8 text-center">
+        <p className="text-red-500 font-medium">{error}</p>
+
+        <button
+          onClick={loadDashboard}
+          className="mt-4 bg-blue-700 text-white px-5 py-2 rounded-xl hover:bg-blue-800 transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -65,6 +91,7 @@ export default function Dashboard() {
         <h2 className="text-3xl font-bold text-slate-800">
           Dashboard Overview
         </h2>
+
         <p className="text-slate-500 mt-1">
           Manage projects, tasks and progress in one place.
         </p>
@@ -84,7 +111,8 @@ export default function Dashboard() {
             >
               <div className="flex justify-between items-center">
                 <p className="text-slate-500">{item.title}</p>
-                <Icon className="text-blue-700" size={22} />
+
+                <Icon size={22} className="text-blue-700" />
               </div>
 
               <h3 className="text-3xl font-bold text-slate-800 mt-4">
@@ -128,23 +156,37 @@ export default function Dashboard() {
 
         <div className="bg-white rounded-2xl shadow p-6">
           <h3 className="font-bold text-lg text-slate-800 mb-5">
-            Recent Activity
+            Summary Insights
           </h3>
 
-          <div className="space-y-4">
-            {[
-              "Homepage redesign task updated",
-              "New project created",
-              "Task moved to review",
-              "Comment added by admin"
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="border-b pb-3 text-slate-600 text-sm"
-              >
-                {item}
-              </div>
-            ))}
+          <div className="space-y-4 text-sm">
+            <div className="border-b pb-3 text-slate-600">
+              Total active work items:{" "}
+              <span className="font-semibold">
+                {data?.totalTasks || 0}
+              </span>
+            </div>
+
+            <div className="border-b pb-3 text-slate-600">
+              Overdue tasks needing attention:{" "}
+              <span className="font-semibold text-red-500">
+                {data?.overdueTasks || 0}
+              </span>
+            </div>
+
+            <div className="border-b pb-3 text-slate-600">
+              Due within 7 days:{" "}
+              <span className="font-semibold text-blue-700">
+                {data?.dueWithin7Days || 0}
+              </span>
+            </div>
+
+            <div className="text-slate-600">
+              Completed tasks:{" "}
+              <span className="font-semibold text-green-600">
+                {data?.doneTasks || 0}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -164,7 +206,7 @@ function ProgressRow({ title, value, total }) {
 
       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className="h-full bg-blue-600 rounded-full"
+          className="h-full bg-blue-600 rounded-full transition-all duration-500"
           style={{ width: `${percent}%` }}
         />
       </div>
